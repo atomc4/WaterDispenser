@@ -128,10 +128,14 @@ function ADDON.GetInventory()
 		end
 	end
 	for bag=BACKPACK_CONTAINER , NUM_BAG_SLOTS do
-		for slot=1,GetContainerNumSlots(bag) do
-			local _, itemCount, _, _, _, lootable, itemLink, _, _, itemID = GetContainerItemInfo(bag, slot)
-			
-			if itemID then 
+		for slot=1,C_Container.GetContainerNumSlots(bag) do
+			local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
+			if containerInfo then 
+				local itemCount = containerInfo.stackCount
+				local lootable = containerInfo.hasLoot
+				local itemLink = containerInfo.hyperlink
+				local itemID = containerInfo.itemID
+
 				if lootable then
 					for i,text in ipairs(ADDON.Tool.ScanToolTip("SetBagItem",bag,slot)) do
 						if text==LOCKED then
@@ -228,7 +232,7 @@ function ADDON.FillTrade(forced)
 	
 	if ADDON.DB.Locked and ADDON.InventoryLockbox and ADDON.TradeClass=="ROGUE" then 
 		ClearCursor()
-		PickupContainerItem(ADDON.InventoryLockbox.Bag, ADDON.InventoryLockbox.Slot)
+		C_Container.PickupContainerItem(ADDON.InventoryLockbox.Bag, ADDON.InventoryLockbox.Slot)
 		ClickTradeButton(TRADE_ENCHANT_SLOT)
 	end
 	
@@ -265,7 +269,7 @@ function ADDON.FillTrade(forced)
 				for ibag,item in ipairs(inv.bag) do
 					if item.full then 
 						ClearCursor()
-						PickupContainerItem(item.bag, item.slot)
+						C_Container.PickupContainerItem(item.bag, item.slot)
 						tradePos=TradeFrame_GetAvailableSlot()
 						if tradePos==nil then
 							return
@@ -282,7 +286,7 @@ function ADDON.FillTrade(forced)
 					for ibag,item in ipairs(inv.bag) do
 						if not item.full then 
 							ClearCursor()
-							PickupContainerItem(item.bag, item.slot)
+							C_Container.PickupContainerItem(item.bag, item.slot)
 							tradePos=TradeFrame_GetAvailableSlot()
 							if tradePos==nil then
 								return
@@ -729,8 +733,8 @@ local function Event_SPELLS_CHANGED()
 	end
 	
 	for bag=BACKPACK_CONTAINER , NUM_BAG_SLOTS do
-		for slot=1,GetContainerNumSlots(bag) do
-			local itemID = GetContainerItemID(bag,slot)
+		for slot=1,C_Container.GetContainerNumSlots(bag) do
+			local itemID = C_Container.GetContainerItemID(bag,slot)
 			if itemID then 
 				GetItemInfo(itemID)
 				if DEBUGMODE then print("bag:",itemID)	end	
